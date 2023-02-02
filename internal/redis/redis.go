@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/apabramov/anti-bruteforce/internal/config"
-	"github.com/redis/go-redis/v9"
+	rds "github.com/redis/go-redis/v9"
 )
 
 var ErrKeyNotFound = errors.New("key not found")
@@ -21,11 +21,11 @@ type Cache interface {
 }
 
 type RedisClient struct {
-	Client *redis.Client
+	Client *rds.Client
 }
 
 func New(conf config.RedisConf) (*RedisClient, error) {
-	rdb := redis.NewClient(&redis.Options{
+	rdb := rds.NewClient(&rds.Options{
 		Addr:     net.JoinHostPort(conf.Host, conf.Port),
 		Password: conf.Pass,
 		DB:       0,
