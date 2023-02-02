@@ -1,4 +1,4 @@
-BIN := "./bin/calendar"
+BIN := "./bin"
 DOCKER_IMG="anti-brute-force:develop"
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
@@ -11,7 +11,7 @@ migrate:
 	goose --dir=migrations postgres "postgres://admin:pgpswd@localhost:5432/db?sslmode=disable" up
 
 build:
-	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/calendar
+	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd
 
 run: build
 	$(BIN) -config ./configs/config.toml
