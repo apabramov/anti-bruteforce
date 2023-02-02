@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+   postgres:
+      image: postgres:14-alpine
+      environment:
+        POSTGRES_DB: ${DB_DATABASE}
+        POSTGRES_USER: ${DB_USERNAME}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+      ports:
+        - 5431:5432
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+      networks:
+        - app-network
+
+   goose:
+       build:
+         context: ../.
+         dockerfile: build/goose/Dockerfile
+       command: ["./wait-for-it.sh", "postgres:5432", "--strict", "--timeout=60", "--", "goose", "--dir=/migrations", "postgres", "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslmode=disable", "up"]
+       volumes:
+         - ./../migrations:/migrations
+       depends_on:
+         - postgres
+       networks:
+         - app-network
+
+   anti-bruteforce:
+       build:
+         context: ../
+         dockerfile: build/app/Dockerfile
+       command: ["./wait-for-it.sh", "postgres:5432", "--strict", "--timeout=60", "--", "/opt/anti-bruteforce/app", "-config", "/etc/anti-bruteforce/config.toml"]
+       volumes:
+         - ./../configs/config.toml:/etc/anti-bruteforce/config.toml
+       ports:
+         - 8088:8088
+         - 12000:12000
+       depends_on:
+         - goose
+       networks:
+         - app-network
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
