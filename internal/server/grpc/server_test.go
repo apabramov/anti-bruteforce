@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis"
-	"github.com/redis/go-redis/v9"
+	rds "github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	c := redis.NewClient(&redis.Options{
+	c := rds.NewClient(&rds.Options{
 		Addr: mr.Addr(),
 	})
 
