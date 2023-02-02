@@ -18,13 +18,13 @@ import (
 	"github.com/apabramov/anti-bruteforce/internal/bucket"
 	"github.com/apabramov/anti-bruteforce/internal/config"
 	"github.com/apabramov/anti-bruteforce/internal/logger"
-	"github.com/apabramov/anti-bruteforce/internal/redis"
+	intrds "github.com/apabramov/anti-bruteforce/internal/redis"
 	"github.com/apabramov/anti-bruteforce/internal/server/pb"
 	ms "github.com/apabramov/anti-bruteforce/internal/storage/memory"
 )
 
 var (
-	client *internalredis.RedisClient
+	client *intrds.RedisClient
 	cfg    config.Config
 )
 
@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 		Addr: mr.Addr(),
 	})
 
-	client = &internalredis.RedisClient{Client: c}
+	client = &intrds.RedisClient{Client: c}
 
 	logg, err := logger.New("info")
 	if err != nil {
