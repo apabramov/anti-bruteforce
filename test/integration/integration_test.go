@@ -1,8 +1,9 @@
+// nolint
 package integration_test
 
 import (
 	"context"
-	"github.com/bxcodec/faker/v3"
+	faker "github.com/bxcodec/faker/v3"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
