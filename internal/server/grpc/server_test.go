@@ -213,6 +213,35 @@ func TestGRPCServerReset(t *testing.T) {
 	})
 }
 
+func TestGRPCServerAddDeleteBlackList(t *testing.T) {
+	t.Run("add auth delete auth", func(t *testing.T) {
+		conn, err := grpc.Dial(net.JoinHostPort(cfg.GrpsServ.Host, cfg.GrpsServ.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			log.Fatalf("did not connect: %v", err)
+		}
+		defer conn.Close()
+		c := pb.NewEventServiceClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+
+		resp, err := c.AddBlackList(ctx, &pb.SubnetRequest{Subnet: "192.168.1.0/24"})
+		require.NoError(t, err)
+		require.True(t, resp.GetError() == "")
+
+		res, err := c.Auth(ctx, &pb.AuthRequest{Login: "login", Password: "pass", Ip: "192.168.1.1"})
+		require.NoError(t, err)
+		require.False(t, res.GetResult())
+
+		result, err := c.DeleteBlackList(ctx, &pb.SubnetRequest{Subnet: "192.168.1.0/24"})
+		require.NoError(t, err)
+		require.True(t, result.GetError() == "")
+
+		res, err = c.Auth(ctx, &pb.AuthRequest{Login: "login", Password: "pass1", Ip: "192.168.1.1"})
+		require.NoError(t, err)
+		require.True(t, res.GetResult())
+	})
+}
+
 func runGrpc(app *app.App, cfg *config.Config, log *logger.Logger) {
 	srv := NewServer(log, app, cfg.GrpsServ)
 

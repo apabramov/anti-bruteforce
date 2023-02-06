@@ -16,7 +16,9 @@ require (
 
 require (
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
+	github.com/bxcodec/faker/v3 v3.8.1
 	github.com/gomodule/redigo v1.8.9 // indirect
+	github.com/spf13/cobra v1.6.1
 	github.com/yuin/gopher-lua v1.1.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 )

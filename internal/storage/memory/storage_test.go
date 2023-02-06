@@ -69,6 +69,7 @@ func TestCheckWhiteList(t *testing.T) {
 	require.NoError(t, err)
 
 	b, err := s.CheckIPWhiteList(ctx, "192.168.1.2")
+	require.NoError(t, err)
 	require.True(t, b)
 }
 

@@ -1,7 +1,7 @@
 # Собираем в гошке
 FROM golang:1.16.2 as build
 
-ENV BIN_FILE /opt/calendar/calendar-app
+ENV BIN_FILE /opt/anti-bruteforce/app
 ENV CODE_DIR /go/src/
 
 WORKDIR ${CODE_DIR}
@@ -18,19 +18,20 @@ COPY . ${CODE_DIR}
 ARG LDFLAGS
 RUN CGO_ENABLED=0 go build \
         -ldflags "$LDFLAGS" \
-        -o ${BIN_FILE} cmd/calendar/*
+        -o ${BIN_FILE} cmd/anti-bruteforce/*
 
 # На выходе тонкий образ
 FROM alpine:3.9
 
-LABEL ORGANIZATION="OTUS Online Education"
-LABEL SERVICE="calendar"
-LABEL MAINTAINERS="student@otus.ru"
+RUN apk add --no-cache bash
 
-ENV BIN_FILE "/opt/calendar/calendar-app"
+ENV BIN_FILE "/opt/anti-bruteforce/app"
 COPY --from=build ${BIN_FILE} ${BIN_FILE}
 
-ENV CONFIG_FILE /etc/calendar/config.toml
+ENV CONFIG_FILE /etc/anti-bruteforce/config.toml
 COPY ./configs/config.toml ${CONFIG_FILE}
 
-CMD ${BIN_FILE} -config ${CONFIG_FILE}
+COPY wait-for-it.sh wait-for-it.sh
+RUN chmod +x wait-for-it.sh
+
+CMD ${BIN_FILE}, -config, ${CONFIG_FILE}
