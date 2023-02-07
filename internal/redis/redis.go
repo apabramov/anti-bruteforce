@@ -50,8 +50,7 @@ func (c *RedisClient) Get(ctx context.Context, key string) (int, error) {
 	}
 	intVal, err := strconv.Atoi(val)
 	if err != nil {
-		// TODO fix error
-		return 0, ErrKeyNotFound
+		return 0, err
 	}
 
 	return intVal, nil

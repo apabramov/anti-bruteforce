@@ -10,23 +10,16 @@ import (
 )
 
 type Storage struct {
-	Dsn string
 	DB  *sqlx.DB
 	Log *logger.Logger
 }
 
-func New(log *logger.Logger, conf config.StorageConf) *Storage {
-	return &Storage{Log: log, Dsn: conf.Dsn}
-}
-
-func (s *Storage) Connect(ctx context.Context) error {
-	db, err := sqlx.Open("postgres", s.Dsn)
+func New(log *logger.Logger, conf config.StorageConf) (*Storage, error) {
+	db, err := sqlx.Open("postgres", conf.Dsn)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	s.DB = db
-	return nil
+	return &Storage{Log: log, DB: db}, nil
 }
 
 func (s *Storage) Close() error {

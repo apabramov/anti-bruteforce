@@ -84,10 +84,12 @@ func Add(cmd *cobra.Command, args []string) error {
 	}
 	subnet := args[0]
 
-	client, err := getGRPCClient()
+	conn, err := getGRPCClient()
 	if err != nil {
 		return err
 	}
+	defer conn.Close()
+	client := pb.NewEventServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -120,10 +122,12 @@ func Del(cmd *cobra.Command, args []string) error {
 	}
 	subnet := args[0]
 
-	client, err := getGRPCClient()
+	conn, err := getGRPCClient()
 	if err != nil {
 		return err
 	}
+	defer conn.Close()
+	client := pb.NewEventServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -155,10 +159,12 @@ func Reset(cmd *cobra.Command, args []string) error {
 	pass := args[1]
 	ip := args[2]
 
-	client, err := getGRPCClient()
+	conn, err := getGRPCClient()
 	if err != nil {
 		return err
 	}
+	defer conn.Close()
+	client := pb.NewEventServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -177,11 +183,11 @@ func Reset(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func getGRPCClient() (pb.EventServiceClient, error) {
+func getGRPCClient() (*grpc.ClientConn, error) {
 	clientOptions := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	conn, err := grpc.Dial(net.JoinHostPort(host, port), clientOptions...)
 	if err != nil {
 		return nil, err
 	}
-	return pb.NewEventServiceClient(conn), nil
+	return conn, nil
 }

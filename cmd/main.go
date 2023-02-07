@@ -44,7 +44,10 @@ func main() {
 	}
 	bucket := bucket.New(cache, config.Limit)
 
-	storage := app.NewStorage(logg, config.Storage)
+	storage, err := app.NewStorage(logg, config.Storage)
+	if err != nil {
+		logg.Log.Info(err.Error())
+	}
 	app := app.New(logg, storage, bucket)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),

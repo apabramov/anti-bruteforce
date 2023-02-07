@@ -24,10 +24,6 @@ func New() *Storage {
 	}
 }
 
-func (s *Storage) Connect(ctx context.Context) error {
-	return nil
-}
-
 func (s *Storage) AddWhiteList(ctx context.Context, subnet string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -44,12 +40,12 @@ func (s *Storage) AddWhiteList(ctx context.Context, subnet string) error {
 }
 
 func (s *Storage) AddBlackList(ctx context.Context, subnet string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	if _, _, err := net.ParseCIDR(subnet); err != nil {
 		return err
 	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	if _, ok := s.blacklist[subnet]; ok {
 		return storage.ErrExists
@@ -85,6 +81,8 @@ func (s *Storage) CheckIPBlackList(ctx context.Context, ip string) (bool, error)
 	if i = net.ParseIP(ip); i == nil {
 		return false, ErrInvalidIP
 	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	for l := range s.blacklist {
 		_, sb, err := net.ParseCIDR(l)
@@ -103,6 +101,9 @@ func (s *Storage) CheckIPWhiteList(ctx context.Context, ip string) (bool, error)
 	if i = net.ParseIP(ip); i == nil {
 		return false, ErrInvalidIP
 	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	for l := range s.whitelist {
 		_, sb, err := net.ParseCIDR(l)
 		if err != nil {

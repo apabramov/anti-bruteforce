@@ -2,8 +2,8 @@ package app
 
 import (
 	"context"
-	"fmt"
-
+	"errors"
+	
 	"github.com/apabramov/anti-bruteforce/internal/bucket"
 	"github.com/apabramov/anti-bruteforce/internal/config"
 	"github.com/apabramov/anti-bruteforce/internal/logger"
@@ -11,6 +11,8 @@ import (
 	memorystorage "github.com/apabramov/anti-bruteforce/internal/storage/memory"
 	sqlstorage "github.com/apabramov/anti-bruteforce/internal/storage/sql"
 )
+
+var ErrTypeStorageNotFound = errors.New("storage type not found")
 
 type App struct {
 	Log    Logger
@@ -33,26 +35,25 @@ type Storage interface {
 
 	CheckIPBlackList(ctx context.Context, ip string) (bool, error)
 	CheckIPWhiteList(ctx context.Context, ip string) (bool, error)
-
-	Connect(ctx context.Context) error
 }
 
-func NewStorage(log *logger.Logger, cfg config.StorageConf) Storage {
-	var st Storage
+func NewStorage(log *logger.Logger, cfg config.StorageConf) (Storage, error) {
+	var (
+		st  Storage
+		err error
+	)
 	switch cfg.Type {
 	case "memory":
 		st = memorystorage.New()
 	case "sql":
-		st = sqlstorage.New(log, cfg)
-		err := st.Connect(context.Background())
+		st, err = sqlstorage.New(log, cfg)
 		if err != nil {
-			log.Info(fmt.Sprintf("NewStorage - %s", err.Error()))
-			return nil
+			return nil, err
 		}
 	default:
-		log.Error(fmt.Sprintf("storage type not found - %s", cfg.Type))
+		return nil, ErrTypeStorageNotFound
 	}
-	return st
+	return st, nil
 }
 
 func New(logger Logger, storage Storage, bucket *bucket.LimitBucket) *App {
