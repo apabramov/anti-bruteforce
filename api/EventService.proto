@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = "./;pb";
+
+service EventService {
+  rpc AddBlackList(SubnetRequest) returns (ResultResponse) {}
+  rpc AddWhiteList(SubnetRequest) returns (ResultResponse) {}
+
+  rpc DeleteBlackList(SubnetRequest) returns (ResultResponse) {}
+  rpc DeleteWhiteList(SubnetRequest) returns (ResultResponse) {}
+
+  rpc Auth(AuthRequest) returns (AuthResponse) {}
+  rpc Reset(AuthRequest) returns (ResultResponse) {}
+}
+
+message AuthRequest {
+  string Login = 1;
+  string Password = 2;
+  string Ip = 3;
+}
+
+message SubnetRequest {
+  string Subnet = 1;
+}
+
+message ResultResponse {
+  string Error = 1;
+}
+
+message AuthResponse {
+  bool Result = 1;
+  string Error = 2;
+}

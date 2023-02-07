@@ -1,0 +1,24 @@
+[logger]
+level = "info"
+
+[HttpServ]
+host = "127.0.0.1"
+port = "8088"
+
+[GrpsServ]
+host = "127.0.0.1"
+port = "12000"
+
+[storage]
+type = "memory"
+dsn = "postgres://admin:pgpswd@localhost:5431/db?sslmode=disable"
+
+[Redis]
+host = "127.0.0.1"
+port = "6379"
+pass = "pass"
+
+[limit]
+limitlogin = 10
+limitpass = 100
+limitip = 1000
